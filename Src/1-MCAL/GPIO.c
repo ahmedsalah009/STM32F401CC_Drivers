@@ -13,24 +13,22 @@
 #define MODE_MASK         0x18
 #define OUTPUT_TYPE_MASK  0x4
 #define PU_PD_MASK        0x3
-
-#define MAX_NUM_OF_PINS   15
-
-#define TWO_BIT_MASK     0x3
-#define ONE_BIT_MASK     0x1
+#define TWO_BIT_MASK      0x3
+#define ONE_BIT_MASK      0x1
+#define BIR_RESET_OFFSET  0x16
 /****************************************************************************************************************/
 /*****************************************************TYPES******************************************************/
 typedef struct{
-	u32 MODER;
-	u32 OTYPER;
-	u32 OSPEEDR;
-	u32 PUPDR;
-	u32 IDR;
-	u32 ODR;
-	u32 BSRR;
-	u32 LCKR;
-	u32 AFRL;
-	u32 AFRH;
+volatile u32 MODER;
+volatile u32 OTYPER;
+volatile u32 OSPEEDR;
+volatile u32 PUPDR;
+volatile u32 IDR;
+volatile u32 ODR;
+volatile u32 BSRR;
+volatile u32 LCKR;
+volatile u32 AFRL;
+volatile u32 AFRH;
 }GPIO_Reg_t;
 
 #define NULL ((void *)0)
@@ -55,6 +53,20 @@ GPIO_ErrorStatus_t  GPIO_Configure_Pin_Init(GPIO_Pin_Confg_t * Add_Str_Pin_Cfg)
 	if( (Add_Str_Pin_Cfg == NULL) || (Add_Str_Pin_Cfg->GPIO_Port == NULL))
 	{
 		Loc_ErrorState = GPIO_NULL_POINTER ;
+	}
+	else if(Add_Str_Pin_Cfg->GPIOPin < GPIO_PIN0 && Add_Str_Pin_Cfg->GPIOPin > GPIO_PIN15 )
+	{
+		Loc_ErrorState = GPIO_PinError ;
+	}
+	else if(Add_Str_Pin_Cfg->GPIOSpeed < GPIO_Speed_Low && Add_Str_Pin_Cfg->GPIOSpeed > GPIO_Speed_Very_High)
+	{
+		Loc_ErrorState = GPIO_SpeedError ;
+
+	}
+	else if(Add_Str_Pin_Cfg->GPIOMode < GPIO_MODE_INPUT_FLOATING && Add_Str_Pin_Cfg->GPIOMode > GPIO_MODE_ANALOG)
+	{
+		Loc_ErrorState = GPIO_WrongMode ;
+
 	}
 	else
 	{
@@ -83,6 +95,50 @@ GPIO_ErrorStatus_t  GPIO_Configure_Pin_Init(GPIO_Pin_Confg_t * Add_Str_Pin_Cfg)
 				((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->OSPEEDR = Temp_Reg ;
 	}
 	return Loc_ErrorState ;
+}
+
+
+GPIO_ErrorStatus_t GPIO_Set_Pin_Value(void * Add_Port,u32 Pin_Num,u32 Value)
+{
+	GPIO_ErrorStatus_t  Loc_ErrorState = GPIO_OK ;
+	if(Add_Port == NULL)
+	{
+		 Loc_ErrorState = GPIO_NULL_POINTER ;
+	}
+	else if(Pin_Num < GPIO_PIN0 && Pin_Num > GPIO_PIN15)
+	{
+		 Loc_ErrorState = GPIO_PinError ;
+	}
+	else
+	{
+		switch(Value)
+		{
+			case GPIO_PIN_HIGH : ((GPIO_Reg_t *)Add_Port)->BSRR |= (1<<(Pin_Num)) ; break ;
+			case GPIO_PIN_LOW : ((GPIO_Reg_t *)Add_Port)->BSRR  |= (1<<(Pin_Num + BIR_RESET_OFFSET )) ; break ;
+			default :Loc_ErrorState = GPIO_PinError ; break ;
+		}
+	}
+	return Loc_ErrorState ;
+}
+
+GPIO_ErrorStatus_t GPIO_Get_Pin_Value(void * Add_Port,u32 Pin_Num,u32 *Add_Pin_Value)
+{
+	u32 Loc_Pin_Value = 0 ;
+	GPIO_ErrorStatus_t  Loc_ErrorState = GPIO_OK ;
+		if(Add_Port == NULL || Add_Pin_Value == NULL)
+		{
+			 Loc_ErrorState = GPIO_NULL_POINTER ;
+		}
+		else if(Pin_Num < GPIO_PIN0 && Pin_Num > GPIO_PIN15)
+		{
+			 Loc_ErrorState = GPIO_PinError ;
+		}
+		else
+		{
+			Loc_Pin_Value = ((GPIO_Reg_t *)Add_Port)->IDR &= (1 << Pin_Num) ;
+			*Add_Pin_Value = Loc_Pin_Value ;
+		}
+		return Loc_ErrorState ;
 }
 
 /****************************************************************************************************************/
