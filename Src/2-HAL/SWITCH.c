@@ -46,8 +46,8 @@ SWITCH_Return_ErrorState_t SWITCH_Get_Read(u32 Switch_Num,u32* Add_Switch_Read){
 	u32 Loc_Switch_Read = 0;
 if (Switch_Num> _SWITCH_NUM){
 	Loc_ErrorState = SWITCH_NOK ; }
-else if(Read==NULL){
-	Local_Error=SWITCH_NULL_POINTER;
+else if(Add_Switch_Read==NULL){
+	Loc_ErrorState=SWITCH_NULL_POINTER;
 }
 else{
 	GPIO_Get_Pin_Value(SWITCHS[Switch_Num].port ,SWITCHS[Switch_Num].Pin ,&Loc_Switch_Read);

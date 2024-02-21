@@ -10,7 +10,7 @@
 #include "RCC_01.h"
 /****************************************************************************************************************/
 /****************************************************DEFINE******************************************************/
-#define RCC_BASE_ADDRESS		0x42003800
+#define RCC_BASE_ADDRESS		0x40023800
 #define SYSCLK_RESET	        0xFFFFFFFC
 #define SWS_MASK                0xC
 #define PLL_SRC_MASK            0x400000
@@ -26,7 +26,7 @@
 
 /***************************************************************************************************************/
 /*****************************************************VARIABLES*************************************************/
-static RCC_Peri_t * const RCC=(RCC_Peri_t *)(RCC_BASE_ADDRESS);
+static RCC_Peri_t * const RCC=((RCC_Peri_t *)(RCC_BASE_ADDRESS));
 
 /***************************************************************************************************************/
 /**********************************************STATIC FUNCTIONS PROTOTYPE***************************************/
@@ -35,13 +35,13 @@ static RCC_Peri_t * const RCC=(RCC_Peri_t *)(RCC_BASE_ADDRESS);
 /***************************************************IMPELEMENTATION*********************************************/
 RCC_Return_ErrorState_t RCC_Enable_Clk(u32 CLK)
 {
-	u32 TIME_OUT = 600 ;
+	u32 TIME_OUT = 1000 ;
 	RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
 		switch(CLK)
 		{
 		case CLK_HSI :
 			RCC->CR |= CLK ;
-			while(!(RCC->CR & HSI_RDY_MASK ) || (TIME_OUT))
+			while(!(RCC->CR & HSI_RDY_MASK ) && (TIME_OUT))
 			{
 				TIME_OUT--;
 			}
@@ -51,7 +51,7 @@ RCC_Return_ErrorState_t RCC_Enable_Clk(u32 CLK)
 
 		case CLK_HSE :
 			RCC->CR |= CLK ;
-	    	while(!(RCC->CR & HSE_RDY_MASK ) || (TIME_OUT))
+	    	while(!(RCC->CR & HSE_RDY_MASK ) && (TIME_OUT))
 	    	{
 	    		TIME_OUT--;
 	    	}
@@ -60,7 +60,7 @@ RCC_Return_ErrorState_t RCC_Enable_Clk(u32 CLK)
 					break ;
 		case CLK_PLL :
 			RCC->CR |= CLK ;
-		    	while(!(RCC->CR & PLL_RDY_MASK ) || (TIME_OUT))
+		    	while(!(RCC->CR & PLL_RDY_MASK ) && (TIME_OUT))
 		    	{
 		    		TIME_OUT--;
 		    	}
@@ -96,7 +96,7 @@ RCC_Return_ErrorState_t RCC_DISABLE_Clk(u32 CLK)
 
 RCC_Return_ErrorState_t RCC_Set_SYSCLK(u32 Copy_SYSCLK)
 {
-	u32 TIME_OUT = 600 ;
+	u32 TIME_OUT = 100000 ;
 	RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
 	if( ((Copy_SYSCLK == SYSCLK_HSI) && ( (RCC->CR & CLK_HSI) == 0) ||
 		((Copy_SYSCLK == SYSCLK_HSE) && ( (RCC->CR & CLK_HSE) == 0)) ||
@@ -112,7 +112,7 @@ RCC_Return_ErrorState_t RCC_Set_SYSCLK(u32 Copy_SYSCLK)
 		Temp_Reg |= Copy_SYSCLK ;
 		RCC->CFGR = Temp_Reg ;
 
-		while( ( (RCC->CFGR & SWS_MASK) != Copy_SYSCLK ) || TIME_OUT )
+		while( ( (RCC->CFGR & SWS_MASK) != Copy_SYSCLK ) && TIME_OUT )
 			{
 				TIME_OUT--;
 			}
@@ -209,33 +209,34 @@ RCC_Return_ErrorState_t RCC_Config_PLL(u32 PLLM , u32 PLLN , u32 PLLP)
 RCC_Return_ErrorState_t RCC_Enable_Peripherals(u32 RCC_PERIPHERAL)
 {
 	RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
-	    if(RCC_PERIPHERAL != 1 || 2 || 4 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
+	    if(RCC_PERIPHERAL == 0 || 1 || 2 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
 	    		               || 101 || 107 || 108 || 109 || 110 || 112 || 113 || 114 )
 	    {
-	    	Loc_ErrorState = RCC_NOK;
+	    	if(RCC_PERIPHERAL < 32)
+	    		    		    {
+	    		    		        RCC->AHB1ENR |= (1<<RCC_PERIPHERAL);
+	    		    		    }
+	    		    		    else if( 32 < RCC_PERIPHERAL && RCC_PERIPHERAL < 64)
+	    		    		    {
+	    		    		        RCC->AHB2ENR |= (1<< (RCC_PERIPHERAL - 32) );
+	    		    		    }
+	    		    		    else if( 64 < RCC_PERIPHERAL && RCC_PERIPHERAL < 96)
+	    		    		    {
+	    		    		        RCC->APB1ENR |= (1<< (RCC_PERIPHERAL - 64) );
+	    		    		    }
+	    		    		    else if( 96 < RCC_PERIPHERAL && RCC_PERIPHERAL < 128)
+	    		    		    {
+	    		    		        RCC->APB2ENR |= (1<< (RCC_PERIPHERAL - 96) );
+	    		    		    }
+	    		    		    else
+	    		    		    {
+	    		    		    	Loc_ErrorState = RCC_NOK;
+	    		    		    }
 	    }
 	    else
 	    {
-	    	  if(RCC_PERIPHERAL < 32)
-	    		    {
-	    		        RCC->AHB1ENR |= (1<<RCC_PERIPHERAL);
-	    		    }
-	    		    else if( 32 < RCC_PERIPHERAL < 64)
-	    		    {
-	    		        RCC->AHB2ENR |= (1<< (RCC_PERIPHERAL - 32) );
-	    		    }
-	    		    else if( 64 < RCC_PERIPHERAL < 96)
-	    		    {
-	    		        RCC->APB1ENR |= (1<< (RCC_PERIPHERAL - 64) );
-	    		    }
-	    		    else if( 96 < RCC_PERIPHERAL < 128)
-	    		    {
-	    		        RCC->APB2ENR |= (1<< (RCC_PERIPHERAL - 96) );
-	    		    }
-	    		    else
-	    		    {
-	    		    	Loc_ErrorState = RCC_NOK;
-	    		    }
+	    	Loc_ErrorState = RCC_NOK;
+
 	    }
 	    return Loc_ErrorState;
 }
@@ -243,33 +244,34 @@ RCC_Return_ErrorState_t RCC_Enable_Peripherals(u32 RCC_PERIPHERAL)
 RCC_Return_ErrorState_t RCC_DISABLE_Peripherals(u32 RCC_PERIPHERAL)
 {
 	RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
-	    if(RCC_PERIPHERAL != 1 || 2 || 4 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
+	    if(RCC_PERIPHERAL == 0 || 1 || 2 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
 	    		               || 101 || 107 || 108 || 109 || 110 || 112 || 113 || 114 )
 	    {
-	    	Loc_ErrorState = RCC_NOK;
+	    	if(RCC_PERIPHERAL < 32)
+	    		    		    {
+	    		    		        RCC->AHB1ENR &= ~(1<<RCC_PERIPHERAL);
+	    		    		    }
+	    		    		    else if( 32 < RCC_PERIPHERAL && RCC_PERIPHERAL < 64)
+	    		    		    {
+	    		    		        RCC->AHB2ENR  &= ~(1<< (RCC_PERIPHERAL - 32) );
+	    		    		    }
+	    		    		    else if( 64 < RCC_PERIPHERAL && RCC_PERIPHERAL < 96)
+	    		    		    {
+	    		    		        RCC->APB1ENR  &= ~(1<< (RCC_PERIPHERAL - 64) );
+	    		    		    }
+	    		    		    else if( 96 < RCC_PERIPHERAL && RCC_PERIPHERAL < 128)
+	    		    		    {
+	    		    		        RCC->APB2ENR  &= ~(1<< (RCC_PERIPHERAL - 96) );
+	    		    		    }
+	    		    		    else
+	    		    		    {
+	    		    		    	Loc_ErrorState = RCC_NOK;
+	    		    		    }
 	    }
 	    else
 	    {
-	    	  if(RCC_PERIPHERAL < 32)
-	    		    {
-	    		        RCC->AHB1ENR &= ~(1<<RCC_PERIPHERAL);
-	    		    }
-	    		    else if( 32 < RCC_PERIPHERAL < 64)
-	    		    {
-	    		        RCC->AHB2ENR  &= ~(1<< (RCC_PERIPHERAL - 32) );
-	    		    }
-	    		    else if( 64 < RCC_PERIPHERAL < 96)
-	    		    {
-	    		        RCC->APB1ENR  &= ~(1<< (RCC_PERIPHERAL - 64) );
-	    		    }
-	    		    else if( 96 < RCC_PERIPHERAL < 128)
-	    		    {
-	    		        RCC->APB2ENR  &= ~(1<< (RCC_PERIPHERAL - 96) );
-	    		    }
-	    		    else
-	    		    {
-	    		    	Loc_ErrorState = RCC_NOK;
-	    		    }
+	    	Loc_ErrorState = RCC_NOK;
+
 	    }
 	    return Loc_ErrorState;
 }
@@ -277,33 +279,34 @@ RCC_Return_ErrorState_t RCC_DISABLE_Peripherals(u32 RCC_PERIPHERAL)
 RCC_Return_ErrorState_t RCC_Enable_LowPower_Peripherals(u32 RCC_PERIPHERAL)
 {
 	 RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
-	 if(RCC_PERIPHERAL != 1 || 2 || 4 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
+	 if(RCC_PERIPHERAL == 0 || 1 || 2 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
 		    		               || 101 || 107 || 108 || 109 || 110 || 112 || 113 || 114 )
 		    {
-		    	Loc_ErrorState = RCC_NOK;
+		 if(RCC_PERIPHERAL < 32)
+		 		    		    {
+		 		    		        RCC->AHB1LPENR |= (1<<RCC_PERIPHERAL);
+		 		    		    }
+		 		    		    else if( 32 < RCC_PERIPHERAL < 64)
+		 		    		    {
+		 		    		        RCC->AHB2LPENR |= (1<< (RCC_PERIPHERAL - 32) );
+		 		    		    }
+		 		    		    else if( 64 < RCC_PERIPHERAL < 96)
+		 		    		    {
+		 		    		        RCC->APB1LPENR |= (1<< (RCC_PERIPHERAL - 64) );
+		 		    		    }
+		 		    		    else if( 96 < RCC_PERIPHERAL < 128)
+		 		    		    {
+		 		    		        RCC->APB2LPENR |= (1<< (RCC_PERIPHERAL - 96) );
+		 		    		    }
+		 		    		    else
+		 		    		    {
+		 		    		    	Loc_ErrorState = RCC_NOK;
+		 		    		    }
 		    }
 		    else
 		    {
-		    	  if(RCC_PERIPHERAL < 32)
-		    		    {
-		    		        RCC->AHB1LPENR |= (1<<RCC_PERIPHERAL);
-		    		    }
-		    		    else if( 32 < RCC_PERIPHERAL < 64)
-		    		    {
-		    		        RCC->AHB2LPENR |= (1<< (RCC_PERIPHERAL - 32) );
-		    		    }
-		    		    else if( 64 < RCC_PERIPHERAL < 96)
-		    		    {
-		    		        RCC->APB1LPENR |= (1<< (RCC_PERIPHERAL - 64) );
-		    		    }
-		    		    else if( 96 < RCC_PERIPHERAL < 128)
-		    		    {
-		    		        RCC->APB2LPENR |= (1<< (RCC_PERIPHERAL - 96) );
-		    		    }
-		    		    else
-		    		    {
-		    		    	Loc_ErrorState = RCC_NOK;
-		    		    }
+		    	Loc_ErrorState = RCC_NOK;
+
 		    }
 		    return Loc_ErrorState;
 }
@@ -312,33 +315,34 @@ RCC_Return_ErrorState_t RCC_Enable_LowPower_Peripherals(u32 RCC_PERIPHERAL)
 RCC_Return_ErrorState_t RCC_Disable_LowPower_Peripherals(u32 RCC_PERIPHERAL)
 {
    	 RCC_Return_ErrorState_t  Loc_ErrorState = RCC_OK ;
-	 if(RCC_PERIPHERAL != 1 || 2 || 4 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
+	 if(RCC_PERIPHERAL == 1 || 2 || 4 || 12 || 21 || 22 || 39 || 64 || 65 || 66 || 67 || 75 || 78 || 79 || 81 || 85 || 86 || 87 || 92 || 96 || 100
 		    		               || 101 || 107 || 108 || 109 || 110 || 112 || 113 || 114 )
 		    {
-		    	Loc_ErrorState = RCC_NOK;
+		 if(RCC_PERIPHERAL < 32)
+		 		    		    {
+		 		    		        RCC->AHB1LPENR &= ~ (1<<RCC_PERIPHERAL);
+		 		    		    }
+		 		    		    else if( 32 < RCC_PERIPHERAL < 64)
+		 		    		    {
+		 		    		        RCC->AHB2LPENR &= ~ (1<< (RCC_PERIPHERAL - 32) );
+		 		    		    }
+		 		    		    else if( 64 < RCC_PERIPHERAL < 96)
+		 		    		    {
+		 		    		        RCC->APB1LPENR &= ~ (1<< (RCC_PERIPHERAL - 64) );
+		 		    		    }
+		 		    		    else if( 96 < RCC_PERIPHERAL < 128)
+		 		    		    {
+		 		    		        RCC->APB2LPENR &= ~ (1<< (RCC_PERIPHERAL - 96) );
+		 		    		    }
+		 		    		    else
+		 		    		    {
+		 		    		    	Loc_ErrorState = RCC_NOK;
+		 		    		    }
 		    }
 		    else
 		    {
-		    	  if(RCC_PERIPHERAL < 32)
-		    		    {
-		    		        RCC->AHB1LPENR &= ~ (1<<RCC_PERIPHERAL);
-		    		    }
-		    		    else if( 32 < RCC_PERIPHERAL < 64)
-		    		    {
-		    		        RCC->AHB2LPENR &= ~ (1<< (RCC_PERIPHERAL - 32) );
-		    		    }
-		    		    else if( 64 < RCC_PERIPHERAL < 96)
-		    		    {
-		    		        RCC->APB1LPENR &= ~ (1<< (RCC_PERIPHERAL - 64) );
-		    		    }
-		    		    else if( 96 < RCC_PERIPHERAL < 128)
-		    		    {
-		    		        RCC->APB2LPENR &= ~ (1<< (RCC_PERIPHERAL - 96) );
-		    		    }
-		    		    else
-		    		    {
-		    		    	Loc_ErrorState = RCC_NOK;
-		    		    }
+		    	Loc_ErrorState = RCC_NOK;
+
 		    }
 		    return Loc_ErrorState;
 }

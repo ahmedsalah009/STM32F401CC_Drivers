@@ -26,9 +26,9 @@
 #define PERIPHERAL_STATE_DISABLE    	0
 #define PERIPHERAL_STATE_ENABLE     	1
 /* options to enable and disable Peripherals on AHB1 bus */
-#define       RCC_GPIOA			 1
-#define       RCC_GPIOB			 2
-#define       RCC_GPIOC          4
+#define       RCC_GPIOA			 0
+#define       RCC_GPIOB			 1
+#define       RCC_GPIOC          2
 #define       RCC_CRCE           12
 #define       RCC_DMA1E          21
 #define       RCC_DMA2E			 22
@@ -76,35 +76,35 @@ typedef enum {
 }RCC_Return_ErrorState_t;
 
 typedef struct {
-		u32 CR;
-	    u32 PLLCFGR;
-	    u32 CFGR;
-	    u32 CIR;
-	    u32 AHB1RSTR;
-	    u32 AHB2RSTR;
-	    u32 reserved1[2];
-	    u32 APB1RSTR;
-	    u32 APB2RSTR;
-	    u32 reserved2[2];
-	    u32 AHB1ENR;
-	    u32 AHB2ENR;
-	    u32 reserved3[2];
-	    u32 APB1ENR;
-	    u32 APB2ENR;
-	    u32 reserved4[2];
-	    u32 AHB1LPENR;
-	    u32 AHB2LPENR;
-	    u32 reserved5[2];
-	    u32 APB1LPENR;
-	    u32 APB2LPENR;
-	    u32 reserved6[2];
-	    u32 BDCR;
-	    u32 CSR;
-	    u32 reserved7[2];
-	    u32 SSCGR;
-	    u32 RCC_PLLI2SCFGR;
-	    u32 reserved8;
-	    u32 DCKCFGR;
+volatile	u32 CR;
+volatile    u32 PLLCFGR;
+volatile    u32 CFGR;
+volatile    u32 CIR;
+volatile    u32 AHB1RSTR;
+volatile    u32 AHB2RSTR;
+volatile    u32 reserved1[2];
+volatile    u32 APB1RSTR;
+volatile    u32 APB2RSTR;
+volatile    u32 reserved2[2];
+volatile    u32 AHB1ENR;
+volatile    u32 AHB2ENR;
+volatile    u32 reserved3[2];
+volatile    u32 APB1ENR;
+volatile    u32 APB2ENR;
+volatile    u32 reserved4[2];
+volatile    u32 AHB1LPENR;
+volatile    u32 AHB2LPENR;
+volatile    u32 reserved5[2];
+volatile    u32 APB1LPENR;
+volatile    u32 APB2LPENR;
+volatile    u32 reserved6[2];
+volatile    u32 BDCR;
+volatile    u32 CSR;
+volatile    u32 reserved7[2];
+volatile    u32 SSCGR;
+volatile    u32 RCC_PLLI2SCFGR;
+volatile    u32 reserved8;
+volatile    u32 DCKCFGR;
 
 }RCC_Peri_t;
 
