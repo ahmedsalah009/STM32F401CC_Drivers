@@ -15,7 +15,9 @@
 #define PU_PD_MASK        0x3
 #define TWO_BIT_MASK      0x3
 #define ONE_BIT_MASK      0x1
-#define BIR_RESET_OFFSET  0x16
+#define BIR_RESET_OFFSET  0x10
+#define MODE_SHIFT        0x03
+#define OUTPUT_TYPE_SHIFT 0x02
 /****************************************************************************************************************/
 /*****************************************************TYPES******************************************************/
 typedef struct{
@@ -45,9 +47,7 @@ volatile u32 AFRH;
 GPIO_ErrorStatus_t  GPIO_Configure_Pin_Init(GPIO_Pin_Confg_t * Add_Str_Pin_Cfg)
 {
 	u32 Temp_Reg = 0 ;
-	u32 Temp_Mode_Value =0 ;
-	u16 Temp_Output_Type_Value = 0 ;
-	u32 Temp_Connection_value = 0 ;
+	u32 Temp_Value =0 ;
 
 	GPIO_ErrorStatus_t  Loc_ErrorState = GPIO_OK ;
 	if( (Add_Str_Pin_Cfg == NULL) || (Add_Str_Pin_Cfg->GPIO_Port == NULL))
@@ -70,23 +70,22 @@ GPIO_ErrorStatus_t  GPIO_Configure_Pin_Init(GPIO_Pin_Confg_t * Add_Str_Pin_Cfg)
 	}
 	else
 	{
-		Temp_Mode_Value        = (Add_Str_Pin_Cfg->GPIOMode & MODE_MASK) ;
-		Temp_Output_Type_Value = (Add_Str_Pin_Cfg->GPIOMode & OUTPUT_TYPE_MASK) ;
-		Temp_Connection_value  = (Add_Str_Pin_Cfg->GPIOMode & PU_PD_MASK) ;
-
+				Temp_Value = ( (Add_Str_Pin_Cfg->GPIOMode & MODE_MASK) >> MODE_SHIFT);
 				Temp_Reg  = ((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->MODER   ;
 				Temp_Reg &=~ (TWO_BIT_MASK << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
-				Temp_Reg |= (Temp_Mode_Value << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
+				Temp_Reg |= (Temp_Value << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
 				((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->MODER = Temp_Reg ;
 
+				Temp_Value = ( (Add_Str_Pin_Cfg->GPIOMode & OUTPUT_TYPE_MASK) >> OUTPUT_TYPE_SHIFT );
 				Temp_Reg = ((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->OTYPER  ;
 				Temp_Reg &=~ (ONE_BIT_MASK << (Add_Str_Pin_Cfg->GPIOPin)) ;
-				Temp_Reg |= (Temp_Output_Type_Value << (Add_Str_Pin_Cfg->GPIOPin)) ;
+				Temp_Reg |= (Temp_Value << (Add_Str_Pin_Cfg->GPIOPin)) ;
 				((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->OTYPER = Temp_Reg ;
 
+				Temp_Value = (Add_Str_Pin_Cfg->GPIOMode & PU_PD_MASK) ;
 				Temp_Reg = ((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->PUPDR   ;
 				Temp_Reg &=~ (TWO_BIT_MASK << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
-				Temp_Reg |= (Temp_Connection_value << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
+				Temp_Reg |= (Temp_Value << (Add_Str_Pin_Cfg->GPIOPin * 2)) ;
 				((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->PUPDR = Temp_Reg ;
 
 				Temp_Reg = ((GPIO_Reg_t *)(Add_Str_Pin_Cfg->GPIO_Port))->OSPEEDR ;
@@ -113,8 +112,8 @@ GPIO_ErrorStatus_t GPIO_Set_Pin_Value(void * Add_Port,u32 Pin_Num,u32 Value)
 	{
 		switch(Value)
 		{
-			case GPIO_PIN_HIGH : ((GPIO_Reg_t *)Add_Port)->BSRR |= (1<<(Pin_Num)) ; break ;
-			case GPIO_PIN_LOW : ((GPIO_Reg_t *)Add_Port)->BSRR  |= (1<<(Pin_Num + BIR_RESET_OFFSET )) ; break ;
+			case GPIO_PIN_HIGH : ((GPIO_Reg_t *)Add_Port)->BSRR |= (1 << (Pin_Num)) ; break ;
+			case GPIO_PIN_LOW : ((GPIO_Reg_t *)Add_Port)->BSRR  |= (1 << (Pin_Num + BIR_RESET_OFFSET )) ; break ;
 			default :Loc_ErrorState = GPIO_PinError ; break ;
 		}
 	}

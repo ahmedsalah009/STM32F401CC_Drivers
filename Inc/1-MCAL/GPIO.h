@@ -17,7 +17,7 @@
 #define GPIO_E          	((void*)0x40021000)
 #define GPIO_H          	((void*)0x40021C00)
 
-#define GPIO_PIN0			((u16)0x0001)
+#define GPIO_PIN0			((u16)0x0000)
 #define GPIO_PIN1			((u16)0x0002)
 #define GPIO_PIN2			((u16)0x0004)
 #define GPIO_PIN3			((u16)0x0008)
@@ -57,9 +57,9 @@
 
 
 #define GPIO_Speed_Low				0x00
-#define GPIO_Speed_Medium			0x01
-#define GPIO_Speed_High				0x10
-#define GPIO_Speed_Very_High		0x11
+#define GPIO_Speed_Medium			0x1
+#define GPIO_Speed_High				0x2
+#define GPIO_Speed_Very_High		0x3
 
 #define GPIO_PIN_LOW                0
 #define GPIO_PIN_HIGH               1
