@@ -15,10 +15,26 @@
 LED_str_Cfg_t LEDS[_LED_NUM] =
 {
 		[LED_ALARM]={ .port=GPIO_A ,
-				      .Pin=GPIO_PIN0,
+				      .Pin=GPIO_PIN8,
 					  .Connetion=CONNECTION_FORWARD,
 					  .Default_Value=LED_STATE_ON
 		            },
+					[GREEN]={ .port=GPIO_A ,
+									      .Pin=GPIO_PIN2,
+										  .Connetion=CONNECTION_FORWARD,
+										  .Default_Value=LED_STATE_OFF
+							            },
+
+										[YELLOW]={ .port=GPIO_A ,
+														      .Pin=GPIO_PIN1,
+															  .Connetion=CONNECTION_FORWARD,
+															  .Default_Value=LED_STATE_OFF
+												            },
+															[RED]={ .port=GPIO_A ,
+																			      .Pin=GPIO_PIN0,
+																				  .Connetion=CONNECTION_FORWARD,
+																				  .Default_Value=LED_STATE_OFF
+																	            },
 
 
 };

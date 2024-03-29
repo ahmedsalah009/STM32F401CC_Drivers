@@ -13,8 +13,9 @@
 /************************************************* TYPES ******************************************************/
 typedef enum
 {
-	Traffic_Lights_Runnable_01,
-
+	Traffic_Lights_Runnable_1,
+	f1_1,
+    f2_2,
 
 	_RUNNABLES_MAX
 }Runnable_List_t;

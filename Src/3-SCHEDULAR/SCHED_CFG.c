@@ -8,6 +8,8 @@
 #include "SCHED_CFG.h"
 #include "SCHED.h"
 extern Traffic_Lights_Runnable() ;
+
+
 /****************************************************************************************************************/
 /****************************************************DEFINE******************************************************/
 
@@ -15,14 +17,13 @@ extern Traffic_Lights_Runnable() ;
 /*****************************************************TYPES******************************************************/
 Runnable_t runnables[_RUNNABLES_MAX] =
 {
-		[Traffic_Lights_Runnable_01]={ .name="Traffic_Lights_Runnable"  ,
-				      .peridicity_ms= 2000,
-					  .periority= 0,
-					  .cb= Traffic_Lights_Runnable ,
-					  .delay_ms= 0 ,
-		            },
 
-
+					[Traffic_Lights_Runnable_1]={ .name="Traffic_Lights_Runnable_1"  ,
+									      .peridicity_ms= 1000,
+										  .periority= 0,
+										  .cb= Traffic_Lights_Runnable ,
+										  .delay_ms= 0 ,
+							            },
 };
 
 /****************************************************************************************************************/

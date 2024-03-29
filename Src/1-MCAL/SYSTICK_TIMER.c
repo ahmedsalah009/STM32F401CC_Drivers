@@ -41,7 +41,7 @@ void SYSTICK_Start(void)
 	SYSTICK->STK_CTRL |=  SYSTICK_INT_ENABLE_MASK ;
 }
 
-void SYSTICK_Stop()
+void SYSTICK_Stop(void)
 {
 	SYSTICK->STK_CTRL &=~  SYSTICK_COUNTER_ENABLE_MASK ;
 	SYSTICK->STK_CTRL &=~  SYSTICK_INT_ENABLE_MASK ;
@@ -73,7 +73,7 @@ SYSTICK_ErrorStatus_t SYSTICK_setTimeMs(u32 Copy_Time)
 	{
 		Loc_Timer_CLK_FRQ = AHB_CLK_FRQ ;
 	}
-	Loc_Temp = (((Loc_Timer_CLK_FRQ * Copy_Time)/1000 )-1);
+	Loc_Temp = (((Loc_Timer_CLK_FRQ /1000 )*Copy_Time )-(u32)1);
 
 	if(Loc_Temp < LOAD_MIN_VALUE || Loc_Temp > LOAD_MAX_VALUE)
 	{
@@ -103,9 +103,10 @@ SYSTICK_ErrorStatus_t SYSTICK_SetCBF(Systick_CBF_t Copy_CBF)
 	return Loc_error_status ;
 }
 
-void SYSTICK_Handler(void)
+void SysTick_Handler(void)
 {
 	App_CallBackFun() ;
+
 }
 
 /****************************************************************************************************************/

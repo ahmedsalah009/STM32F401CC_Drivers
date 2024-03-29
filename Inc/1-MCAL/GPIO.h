@@ -17,22 +17,22 @@
 #define GPIO_E          	((void*)0x40021000)
 #define GPIO_H          	((void*)0x40021C00)
 
-#define GPIO_PIN0			((u16)0x0000)
-#define GPIO_PIN1			((u16)0x0002)
-#define GPIO_PIN2			((u16)0x0004)
-#define GPIO_PIN3			((u16)0x0008)
-#define GPIO_PIN4			((u16)0x0010)
-#define GPIO_PIN5			((u16)0x0020)
-#define GPIO_PIN6			((u16)0x0040)
-#define GPIO_PIN7			((u16)0x0080)
-#define GPIO_PIN8			((u16)0x0100)
-#define GPIO_PIN9			((u16)0x0200)
-#define GPIO_PIN10			((u16)0x0400)
-#define GPIO_PIN11			((u16)0x0800)
-#define GPIO_PIN12			((u16)0x1000)
-#define GPIO_PIN13			((u16)0x2000)
-#define GPIO_PIN14			((u16)0x4000)
-#define GPIO_PIN15			((u16)0x8000)
+#define GPIO_PIN0			0x00000000
+#define GPIO_PIN1			0x00000001
+#define GPIO_PIN2			0x00000002
+#define GPIO_PIN3			0x00000003
+#define GPIO_PIN4			0x00000004
+#define GPIO_PIN5			0x00000005
+#define GPIO_PIN6			0x00000006
+#define GPIO_PIN7			0x00000007
+#define GPIO_PIN8			0x00000008
+#define GPIO_PIN9			0x00000009
+#define GPIO_PIN10			0x0000000A
+#define GPIO_PIN11			0x0000000B
+#define GPIO_PIN12			0x0000000C
+#define GPIO_PIN13			0x0000000D
+#define GPIO_PIN14			0x0000000E
+#define GPIO_PIN15          0x0000000F
 
 #define GPIO_MODE_INPUT_FLOATING 			0x00000000
 #define GPIO_MODE_INPUT_PU					0x00000001
@@ -203,9 +203,6 @@ GPIO_ErrorStatus_t GPIO_Get_Pin_Value(void * Add_Port,u32 Pin_num,u32 *Add_Pin_V
 /**************************************************************************************************************/
 
 #endif /* GPIO_H_ */
-
-
-
 
 
 

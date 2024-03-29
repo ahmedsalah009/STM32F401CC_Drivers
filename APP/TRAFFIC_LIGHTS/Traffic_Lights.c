@@ -6,7 +6,7 @@
  */
 #include "LED.h"
 
-#define TICK_TIME 2
+#define TICK_TIME 1
 
 
 typedef unsigned char u8 ;
@@ -23,7 +23,7 @@ void Traffic_Lights_Runnable(void)
 	static u8 time = 0 ;
 	enu_states_t static state = G ;
 	time += TICK_TIME ;
-	u8 prev = 50 ;
+	u8 static prev = 50 ;
 	switch(state)
 
 	{
@@ -32,7 +32,7 @@ void Traffic_Lights_Runnable(void)
 			LED_Set_State(YELLOW, LED_STATE_OFF);
 			LED_Set_State(RED, LED_STATE_OFF);
 
-			if(time == 6)
+			if(time == 5)
 			{
 				prev = G ;
 				state = Y ;
@@ -46,7 +46,7 @@ void Traffic_Lights_Runnable(void)
 		LED_Set_State(YELLOW, LED_STATE_ON);
 		LED_Set_State(RED, LED_STATE_OFF);
 
-		if(time == 2)
+		if(time == 3)
 		{
 			if(prev==G)
 			{
@@ -66,10 +66,10 @@ void Traffic_Lights_Runnable(void)
 
 	case R :
 		LED_Set_State(GREEN, LED_STATE_OFF);
-		LED_Set_State(RED, LED_STATE_OFF);
-		LED_Set_State(YELLOW, LED_STATE_ON);
+		LED_Set_State(RED, LED_STATE_ON);
+		LED_Set_State(YELLOW, LED_STATE_OFF);
 
-		if(time == 10)
+		if(time == 5)
 					{
 						prev = R ;
 						state = Y ;
