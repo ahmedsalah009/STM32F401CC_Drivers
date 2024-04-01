@@ -7,7 +7,8 @@
 /***************************************************INCLUDE******************************************************/
 #include "SCHED_CFG.h"
 #include "SCHED.h"
-extern Traffic_Lights_Runnable() ;
+extern  LCD_Runnable() ;
+extern LCD_SM_Runnable() ;
 
 
 /****************************************************************************************************************/
@@ -15,16 +16,21 @@ extern Traffic_Lights_Runnable() ;
 
 /****************************************************************************************************************/
 /*****************************************************TYPES******************************************************/
-Runnable_t runnables[_RUNNABLES_MAX] =
-{
+Runnable_t runnables[_RUNNABLES_MAX] = {
+		[LCD_Runnable_1]={                        .name="LCD_Runnable_1"  ,
+											      .peridicity_ms= 1,
+												  .periority= 0,
+												  .cb= LCD_Runnable ,
+												  .delay_ms= 0 ,
+									            },
+		[LCD_SM_Runnable_1]={                        .name="LCD_SM_Runnable_1"  ,
+													      .peridicity_ms= 1000 ,
+														  .periority= 0,
+														  .cb= LCD_SM_Runnable ,
+														  .delay_ms= 0 ,
+											            },
 
-					[Traffic_Lights_Runnable_1]={ .name="Traffic_Lights_Runnable_1"  ,
-									      .peridicity_ms= 1000,
-										  .periority= 0,
-										  .cb= Traffic_Lights_Runnable ,
-										  .delay_ms= 0 ,
-							            },
-};
+} ;
 
 /****************************************************************************************************************/
 /*****************************************************VARIABLES**************************************************/
